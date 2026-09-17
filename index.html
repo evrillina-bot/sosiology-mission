@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sosiologi Mission - Pink Edition</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+    <!-- MUTE BUTTON -->
+    <button class="sound-toggle" onclick="toggleMute()" title="Suara On/Off">
+        <i id="mute-icon" class="fas fa-volume-up"></i>
+    </button>
+
+    <!-- CONTAINER UTAMA -->
+    <div class="app-container">
+
+        <!-- WELCOME SCREEN -->
+        <div id="welcome-screen" class="screen active">
+            <div class="character-avatar">🤖✨</div>
+            <h1>Sociology Mission</h1>
+            <p class="subtitle">Petualangan Investigasi Sosiologi Bersama Gemini</p>
+            
+            <form onsubmit="startGame(event)">
+                <div class="input-group">
+                    <label for="player-name-input">Nama Investigator:</label>
+                    <input type="text" id="player-name-input" value="Gemini" required placeholder="Masukkan namamu...">
+                </div>
+                <button type="submit" class="btn btn-primary btn-bounce">
+                    <i class="fas fa-play"></i> Mulai Investigasi
+                </button>
+            </form>
+
+            <div id="resume-container" class="hidden">
+                <hr class="divider">
+                <p>Data tersimpan ditemukan untuk <strong id="saved-name"></strong></p>
+                <button onclick="resumeGame()" class="btn btn-secondary">
+                    <i class="fas fa-rotate-right"></i> Lanjutkan Progress
+                </button>
+            </div>
+        </div>
+
+        <!-- DASHBOARD SCREEN -->
+        <div id="dashboard-screen" class="screen">
+            <div class="dashboard-header">
+                <div class="user-info">
+                    <span class="avatar-mini">🤖</span>
+                    <div>
+                        <h2>Hai, <span id="display-name">Gemini</span>!</h2>
+                        <p>Pilih Misi Investigasimu hari ini</p>
+                    </div>
+                </div>
+                <div class="score-badge">
+                    <i class="fas fa-star"></i> <span id="total-score-display">0</span> Pts
+                </div>
+            </div>
+
+            <div id="level-grid" class="level-grid"></div>
+        </div>
+
+        <!-- GAMEPLAY SCREEN -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <button class="btn-icon" onclick="exitToDashboard()"><i class="fas fa-arrow-left"></i></button>
+                <span id="current-mission-title">Misi 1</span>
+                <div class="stat-pill"><i class="fas fa-heart"></i> <span id="lives-count">3</span></div>
+            </div>
+
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+
+            <div class="quiz-card">
+                <div class="quiz-meta">
+                    <span id="question-number-badge" class="badge">Soal 1/5</span>
+                    <span id="question-type-badge" class="badge badge-pink">Studi Kasus</span>
+                    <span class="timer-pill"><i class="fas fa-clock"></i> <span id="timer-display">25</span>s</span>
+                </div>
+
+                <p id="question-text" class="question-text">Memuat pertanyaan...</p>
+
+                <div id="options-container" class="options-grid"></div>
+
+                <div id="feedback-panel" class="feedback-panel hidden">
+                    <div class="feedback-header">
+                        <i id="feedback-icon" class="fas fa-check-circle"></i>
+                        <h4 id="feedback-title">Jawaban Benar!</h4>
+                    </div>
+                    <p id="feedback-explanation">Penjelasan...</p>
+                    <button class="btn btn-primary" onclick="nextQuestion()">Lanjut <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div id="result-screen" class="screen">
+            <div id="report-card" class="report-card">
+                <div class="mascot-header">
+                    <div class="character-avatar-small">🤖💖</div>
+                    <h2 id="result-category">MASTER SOCIAL INVESTIGATOR</h2>
+                    <p>Laporan Hasil Investigasi Sosiologi</p>
+                </div>
+
+                <div class="report-details">
+                    <div class="report-row"><span>Nama Investigator:</span><strong id="report-name">Gemini</strong></div>
+                    <div class="report-row"><span>Total Skor:</span><strong id="report-score">0</strong></div>
+                    <div class="report-row"><span>Akurasi Jawaban:</span><strong id="report-accuracy">0%</strong></div>
+                    <div class="report-row"><span>Benar / Salah:</span><span><b id="report-correct" class="color-green">0</b> / <b id="report-wrong" class="color-red">0</b></span></div>
+                    <div class="report-row"><span>Waktu Bermain:</span><strong id="report-time">00:00</strong></div>
+                    <div class="report-row"><span>Misi Terselesaikan:</span><strong id="report-levels">0/6</strong></div>
+                </div>
+
+                <div class="motivation-box">
+                    <p id="report-motivation">Pesan motivasi...</p>
+                </div>
+            </div>
+
+            <div class="result-actions">
+                <button onclick="restartGame()" class="btn btn-secondary"><i class="fas fa-rotate-right"></i> Main Lagi</button>
+                <button onclick="showDashboard()" class="btn btn-secondary"><i class="fas fa-th-large"></i> Pilih Level</button>
+                <button onclick="downloadReport()" class="btn btn-primary"><i class="fas fa-download"></i> Download Hasil</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CUSTOM POPUP MODAL (PENGGANTI ALERT JAADUL) -->
+    <div id="custom-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div id="modal-mascot" class="modal-mascot">🥳✨</div>
+            <h3 id="modal-title">Selamat!</h3>
+            <p id="modal-message">Misi selesai!</p>
+            <button onclick="closeModal()" class="btn btn-primary">Lanjutkan <i class="fas fa-sparkles"></i></button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
